@@ -1,0 +1,29 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity alu_1bit is
+    port (
+        i_a, i_b   : in  std_logic;
+        i_carryIn  : in  std_logic;
+        i_operation: in  std_logic_vector(1 downto 0); 
+        o_result   : out std_logic;
+        o_carryOut : out std_logic
+    );
+end alu_1bit;
+
+architecture structural of alu_1bit is
+    signal s_and, s_or, s_add : std_logic;
+begin
+    s_and <= i_a and i_b;
+    s_or  <= i_a or i_b;
+
+    -- Full Adder Logic
+    s_add      <= i_a xor i_b xor i_carryIn;
+    o_carryOut <= (i_a and i_b) or (i_carryIn and (i_a xor i_b));
+
+    with i_operation select
+        o_result <= s_and when "00",
+                    s_or  when "01",
+                    s_add when "10",
+                    s_add when others; 
+end structural;

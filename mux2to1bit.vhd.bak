@@ -1,0 +1,15 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity mux2to1bit is
+    port (
+        i_A, i_B : in std_logic;
+        i_S      : in std_logic;
+        o_Y      : out std_logic
+    );
+end mux2to1bit;
+
+architecture structural of mux2to1_1bit is
+begin
+    o_Y <= (i_A and (not i_S)) or (i_B and i_S);
+end structural;

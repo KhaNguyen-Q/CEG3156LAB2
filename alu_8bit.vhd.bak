@@ -1,0 +1,51 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity alu_8bit is
+    port (
+        i_A, i_B     : in  std_logic_vector(7 downto 0);
+        i_op         : in  std_logic_vector(1 downto 0); -- 00:AND, 01:OR, 10:ADD/SUB
+        i_sub        : in  std_logic;                   -- '1' for SUB, '0' for ADD
+        o_result     : out std_logic_vector(7 downto 0);
+        o_zero       : out std_logic                    -- The Zero Flag
+    );
+end alu_8bit;
+
+architecture structural of alu_8bit is
+    component alu_1bit
+        port (
+            i_a, i_b, i_carryIn : in std_logic;
+            i_operation         : in std_logic_vector(1 downto 0);
+            o_result, o_carryOut: out std_logic
+        );
+    end component;
+
+    signal s_carry : std_logic_vector(8 downto 0);
+    signal s_b_inv : std_logic_vector(7 downto 0);
+    signal s_res   : std_logic_vector(7 downto 0);
+
+begin
+    -- For subtraction: A + (NOT B) + 1. The +1 comes from setting carry(0) to '1'.
+    s_carry(0) <= i_sub;
+    
+    gen_alu: for i in 0 to 7 generate
+        -- If i_sub is '1', B bits are inverted for 2's complement math
+        s_b_inv(i) <= i_B(i) xor i_sub;
+
+        bit_slice: alu_1bit port map (
+            i_a         => i_A(i),
+            i_b         => s_b_inv(i),
+            i_carryIn   => s_carry(i),
+            i_operation => i_op,
+            o_result    => s_res(i),
+            o_carryOut  => s_carry(i+1)
+        );
+    end generate;
+
+    -- The Zero Flag: '1' only if every single bit of the result is '0'
+    o_zero <= NOT (s_res(0) OR s_res(1) OR s_res(2) OR s_res(3) OR 
+                   s_res(4) OR s_res(5) OR s_res(6) OR s_res(7));
+
+    o_result <= s_res;
+
+end structural;

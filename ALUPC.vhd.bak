@@ -1,0 +1,16 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+ENTITY ALUPC IS
+	PORT(
+	i_a : in std_logic_vector(7 downto 0);
+	i_b : in std_logic_vector(7 downto 0);
+	o_s : out std_logic_vector(7 downto 0)
+	);
+END ALUPC;
+
+ARCHITECTURE STRUCURAL OF ALUPC IS
+
+	COMPONENT(
+	)
+	

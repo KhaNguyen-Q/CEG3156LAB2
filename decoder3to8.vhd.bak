@@ -1,0 +1,32 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+ENTITY decoder3to8 IS
+    PORT (
+        i_w  : IN  STD_LOGIC_VECTOR(2 DOWNTO 0); -- Address bits
+        i_en : IN  STD_LOGIC;                    -- Global Enable
+        o_y  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)  -- 8 Load signals
+    );
+END decoder3to8;
+
+ARCHITECTURE structural OF decoder3to8 IS
+    SIGNAL s_notw : STD_LOGIC_VECTOR(2 DOWNTO 0);
+BEGIN
+    -- 1. Invert the inputs (The 'NOT' layer)
+    s_notw(2) <= NOT i_w(2);
+    s_notw(1) <= NOT i_w(1);
+    s_notw(0) <= NOT i_w(0);
+
+    -- 2. The 'AND' layer (Each gate represents one register address)
+    -- We include 'i_en' in every gate so no register is selected if RegWrite is 0
+    
+    o_y(0) <= s_notw(2) AND s_notw(1) AND s_notw(0) AND i_en; -- 000
+    o_y(1) <= s_notw(2) AND s_notw(1) AND i_w(0)    AND i_en; -- 001
+    o_y(2) <= s_notw(2) AND i_w(1)    AND s_notw(0) AND i_en; -- 010
+    o_y(3) <= s_notw(2) AND i_w(1)    AND i_w(0)    AND i_en; -- 011
+    o_y(4) <= i_w(2)    AND s_notw(1) AND s_notw(0) AND i_en; -- 100
+    o_y(5) <= i_w(2)    AND s_notw(1) AND i_w(0)    AND i_en; -- 101
+    o_y(6) <= i_w(2)    AND i_w(1)    AND s_notw(0) AND i_en; -- 110
+    o_y(7) <= i_w(2)    AND i_w(1)    AND i_w(0)    AND i_en; -- 111
+
+END structural;
